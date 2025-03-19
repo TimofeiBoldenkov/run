@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [[ $# != 1 ]]; then
+    echo 'usage: run <filename> [-p "arg1 arg2 ..."] [-c "arg1 arg2 ..."]'
+    exit 1
+fi
+
+filename="$1"
+extension="${filename##*.}"
+base="$(basename "$filename" ".$extension")"
+
+if [[ "$extension" != "c" && "$extension" != "cpp" ]]; then
+    echo "invalid extension: $extension"
+    echo "appropriate extensions: c, cpp"
+    exit 1
+fi
+
+if [[ "$extension" == "c" ]]; then
+    gcc "$filename" -o "$base"
+    ./"$base"
+    rm "$base"
+fi
+if [[ "$extension" == "cpp" ]]; then
+    g++ "$filename" -o ./"$base"
+    ./"$base"
+    rm "$base"
+fi
