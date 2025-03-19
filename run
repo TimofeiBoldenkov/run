@@ -1,7 +1,11 @@
 #!/bin/bash
 
-if [[ $# != 1 ]]; then
+usage () {
     echo 'usage: run <filename> [-p "arg1 arg2 ..."] [-c "arg1 arg2 ..."]'
+}
+
+if [[ $# -lt 1 ]]; then
+    usage
     exit 1
 fi
 
@@ -9,19 +13,44 @@ filename="$1"
 extension="${filename##*.}"
 base="$(basename "$filename" ".$extension")"
 
-if [[ "$extension" != "c" && "$extension" != "cpp" ]]; then
+if [[ "$extension" != "c" && "$extension" != "cpp" ]]
+then
     echo "invalid extension: $extension"
     echo "appropriate extensions: c, cpp"
     exit 1
 fi
 
-if [[ "$extension" == "c" ]]; then
-    gcc "$filename" -o "$base"
-    ./"$base"
+args=("$@")
+program_args=""
+compiler_args=""
+
+i=1
+while [[ $i -lt $# ]]
+do
+    if [[ "${args[$i]}" = "-p" ]]
+    then
+        ((i++))
+        program_args="$program_args ${args[$i]}"
+    elif [[ "${args[$i]}" = "-c" ]]
+    then
+        ((i++))
+        compiler_args="$compiler_args ${args[$i]}"
+    else
+        echo "invalid argument: ${args[$i]}"
+        usage
+        exit 1
+    fi
+
+    ((i++))
+done
+
+if [[ "$extension" == "c" ]]
+then
+    gcc "$filename" -o "$base" $compiler_args
+    ./"$base" $program_args 
     rm "$base"
-fi
-if [[ "$extension" == "cpp" ]]; then
-    g++ "$filename" -o ./"$base"
-    ./"$base"
+else
+    g++ "$filename" -o "$base" $compiler_args
+    ./"$base" $program_args
     rm "$base"
 fi
