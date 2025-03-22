@@ -13,7 +13,11 @@ fi
 filename="$1"
 extension="${filename##*.}"
 
-if [ ! -f "$filename" ]
+if [[ $filename = "--help" ]]
+then
+	usage
+	exit 0
+elif [ ! -f "$filename" ]
 then
     echo "run: error: '$filename' does not exist"
     exit 1
