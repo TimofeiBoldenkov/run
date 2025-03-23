@@ -82,7 +82,7 @@ then
 fi
 "$output" $program_args
 exit_code=$?
-if [[ tmp_output = true ]]
+if [[ $tmp_output = true ]]
 then
     rm "$output"
 fi
